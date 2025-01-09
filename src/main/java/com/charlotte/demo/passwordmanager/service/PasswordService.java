@@ -1,0 +1,40 @@
+package com.charlotte.demo.passwordmanager.service;
+
+import com.charlotte.demo.passwordmanager.model.Password;
+import com.charlotte.demo.passwordmanager.repository.PasswordRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.encrypt.Encryptors;
+import org.springframework.security.crypto.encrypt.TextEncryptor;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class PasswordService {
+
+    @Autowired
+    private PasswordRepository passwordRepository;
+
+    private final TextEncryptor encryptor = Encryptors.text("password", "5c0744940b5c369b");
+
+    public List<Password> findAll() {
+        return passwordRepository.findAll();
+    }
+
+    public Password save(Password password) {
+        password.setEncryptedPassword(encryptor.encrypt(password.getEncryptedPassword()));
+        return passwordRepository.save(password);
+    }
+
+    public void deleteById(Long id) {
+        passwordRepository.deleteById(id);
+    }
+
+    public Password findById(Long id) {
+        Password password = passwordRepository.findById(id).orElse(null);
+        if (password != null) {
+            password.setEncryptedPassword(encryptor.decrypt(password.getEncryptedPassword()));
+        }
+        return password;
+    }
+}
