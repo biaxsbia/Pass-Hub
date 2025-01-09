@@ -1,6 +1,3 @@
-package com.charlotte.demo.passwordmanager.security;
-
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -16,11 +13,12 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
-                .authorizeRequests()
-                .antMatchers("/passwords/**").authenticated()
-                .anyRequest().permitAll()
-                .and()
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/passwords/**").authenticated()
+                        .anyRequest().permitAll()
+                )
                 .httpBasic();
+
         return http.build();
     }
 
