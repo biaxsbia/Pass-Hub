@@ -1,7 +1,7 @@
-package com.charlotte.demo.passwordmanager.service;
+package com.charlotte.passhub.passwordmanager.service;
 
-import com.charlotte.demo.passwordmanager.model.Password;
-import com.charlotte.demo.passwordmanager.repository.PasswordRepository;
+import com.charlotte.passhub.passwordmanager.model.Password;
+import com.charlotte.passhub.passwordmanager.repository.PasswordRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.encrypt.Encryptors;
 import org.springframework.security.crypto.encrypt.TextEncryptor;
