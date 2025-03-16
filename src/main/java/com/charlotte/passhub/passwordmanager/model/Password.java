@@ -20,10 +20,19 @@ public class Password {
     private String email;
     private String encryptedPassword;
     private String notes;
+    private String user;
     @CreationTimestamp
     private LocalDateTime createdAt;
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
+    }
 
     public Long getId() {
         return Id;
