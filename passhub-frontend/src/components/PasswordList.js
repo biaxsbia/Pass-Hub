@@ -14,25 +14,16 @@ const PasswordList = () => {
 
     const fetchPasswords = async () => {
         try {
-            const response = await api.get();
+            const response = await api.get('/');
             setPasswords(response.data);
         } catch (error) {
             console.error('Erro ao buscar senhas:', error);
         }
     };
 
-    const handleViewDetails = async (id) => {
-        try {
-            const response = await api.get(`/${id}`); 
-            setSelectedPassword(response.data);
-        } catch (error) {
-            console.error('Erro ao buscar detalhes da senha:', error);
-        }
-    };
-
     const handleAddPassword = async (password) => {
         try {
-            await api.post('', password);
+            await api.post('/', password);
             fetchPasswords();
             setShowForm(false);
         } catch (error) {
@@ -82,15 +73,10 @@ const PasswordList = () => {
             )}
 
             <ul>
-            <li style={{ fontWeight: 'bold', display: 'flex', justifyContent: 'space-between', padding: '10px', borderBottom: '1px solid #ccc' }}>
-                <span>Serviço</span>
-        <span>Usuário</span>
-        <span>Ações</span>
-                </li>
                 {passwords.map((password) => (
-                    <li key={password.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '10px', borderBottom: '1px solid #eee' }}>
-                        <strong>{password.serviceName}</strong> {password.username}
-                        <button onClick={() => handleViewDetails(password.id)}>Ver detalhes</button>
+                    <li key={password.id}>
+                        <strong>{password.serviceName}</strong> - {password.username}
+                        <button onClick={() => setSelectedPassword(password)}>Editar</button>
                         <button onClick={() => handleDeletePassword(password.id)}>Excluir</button>
                     </li>
                 ))}

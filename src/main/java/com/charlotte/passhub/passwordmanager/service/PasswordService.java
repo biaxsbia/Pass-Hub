@@ -17,12 +17,8 @@ public class PasswordService {
 
     private final TextEncryptor encryptor = Encryptors.text("password", "5c0744940b5c369b");
 
-    public List<Password> findByUser(String user) {
-        List<Password> passwords = passwordRepository.findByUser(user);
-        passwords.forEach(password -> {
-            password.setEncryptedPassword(encryptor.decrypt(password.getEncryptedPassword()));
-        });
-        return passwords;
+    public List<Password> findAll() {
+        return passwordRepository.findAll();
     }
 
     public Password save(Password password) {
@@ -30,12 +26,12 @@ public class PasswordService {
         return passwordRepository.save(password);
     }
 
-    public void deleteByIdAndUser(Long id, String user) {
-        passwordRepository.deleteByIdAndUser(id, user);
+    public void deleteById(Long id) {
+        passwordRepository.deleteById(id);
     }
 
-    public Password findByIdAndUser(Long id, String user) {
-        Password password = passwordRepository.findByIdAndUser(id, user).orElse(null);
+    public Password findById(Long id) {
+        Password password = passwordRepository.findById(id).orElse(null);
         if (password != null) {
             password.setEncryptedPassword(encryptor.decrypt(password.getEncryptedPassword()));
         }
