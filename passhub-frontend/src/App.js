@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import Login from './Login';
-import PasswordList from './PasswordList';
+import Login from './components/Login';
+import PasswordList from './components/PasswordList';
 
 const App = () => {
     const [token, setToken] = useState(localStorage.getItem('token'));
