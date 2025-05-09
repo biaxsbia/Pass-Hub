@@ -12,43 +12,45 @@ const PasswordList = () => {
         fetchPasswords();
     }, []);
 
-    const fetchPasswords = async () => {
-        try {
-            const response = await api.get('/');
-            setPasswords(response.data);
-        } catch (error) {
-            console.error('Erro ao buscar senhas:', error);
-        }
-    };
+    
+const fetchPasswords = async () => {
+    try {
+        const response = await api.get(''); 
+        setPasswords(response.data);
+    } catch (error) {
+        console.error('Erro ao buscar senhas:', error);
+    }
+};
 
-    const handleAddPassword = async (password) => {
-        try {
-            await api.post('/', password);
-            fetchPasswords();
-            setShowForm(false);
-        } catch (error) {
-            console.error('Erro ao adicionar senha:', error);
-        }
-    };
 
-    const handleUpdatePassword = async (id, password) => {
-        try {
-            await api.put(`/${id}`, password);
-            fetchPasswords();
-            setSelectedPassword(null);
-        } catch (error) {
-            console.error('Erro ao atualizar senha:', error);
-        }
-    };
+const handleAddPassword = async (password) => {
+    try {
+        await api.post('', password); 
+        fetchPasswords();
+        setShowForm(false);
+    } catch (error) {
+        console.error('Erro ao adicionar senha:', error);
+    }
+};
 
-    const handleDeletePassword = async (id) => {
-        try {
-            await api.delete(`/${id}`);
-            fetchPasswords();
-        } catch (error) {
-            console.error('Erro ao excluir senha:', error);
-        }
-    };
+const handleUpdatePassword = async (id, password) => {
+    try {
+        await api.put(`/${id}`, password); 
+        fetchPasswords();
+        setSelectedPassword(null);
+    } catch (error) {
+        console.error('Erro ao atualizar senha:', error);
+    }
+};
+
+const handleDeletePassword = async (id) => {
+    try {
+        await api.delete(`/${id}`);
+        fetchPasswords();
+    } catch (error) {
+        console.error('Erro ao excluir senha:', error);
+    }
+};
 
     return (
         <div>
@@ -75,7 +77,7 @@ const PasswordList = () => {
             <ul>
                 {passwords.map((password) => (
                     <li key={password.id}>
-                        <strong>{password.serviceName}</strong> - {password.username}
+                        <strong>{password.serviceName}</strong> {password.username}
                         <button onClick={() => setSelectedPassword(password)}>Editar</button>
                         <button onClick={() => handleDeletePassword(password.id)}>Excluir</button>
                     </li>
