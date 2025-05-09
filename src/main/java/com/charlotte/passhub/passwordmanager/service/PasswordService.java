@@ -22,6 +22,17 @@ public class PasswordService {
     }
 
     public Password save(Password password) {
+        // Verifica se é uma atualização (já tem ID)
+        if (password.getId() != null) {
+            Password existing = passwordRepository.findById(password.getId()).orElse(null);
+            if (existing != null) {
+                // Se a senha não foi alterada, mantém a criptografia existente
+                if (password.getEncryptedPassword().equals(existing.getEncryptedPassword())) {
+                    return passwordRepository.save(password);
+                }
+            }
+        }
+        // Se for novo registro ou senha alterada, criptografa
         password.setEncryptedPassword(encryptor.encrypt(password.getEncryptedPassword()));
         return passwordRepository.save(password);
     }
