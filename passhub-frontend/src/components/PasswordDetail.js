@@ -1,36 +1,48 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import api from '../services/api';
 import PasswordForm from './PasswordForm';
 
 const PasswordDetail = ({ password, onUpdate, onCancel }) => {
     const [isEditing, setIsEditing] = useState(false);
+    const [detailedPassword, setDetailedPassword] = useState(password);
+
+    useEffect(() => {
+        // Busca a senha descriptografada pelo ID
+        if (password && password.id) {
+            api.get(`/${password.id}`)
+                .then(res => setDetailedPassword(res.data))
+                .catch(err => console.error('Erro ao buscar detalhes da senha:', err));
+        }
+    }, [password]);
 
     const handleUpdate = (updatedPassword) => {
-        // Garante que estamos enviando a senha descriptografada
-        onUpdate(password.id, {
+        onUpdate(detailedPassword.id, {
             ...updatedPassword,
-            encryptedPassword: updatedPassword.password // Assume que o form usa campo "password"
+            encryptedPassword: updatedPassword.password // o form envia em campo "password"
         });
         setIsEditing(false);
     };
+
+    if (!detailedPassword) return <p>Carregando...</p>;
 
     return (
         <div>
             {isEditing ? (
                 <PasswordForm
                     initialData={{
-                        ...password,
-                        password: password.encryptedPassword // Passa a senha descriptografada
+                        ...detailedPassword,
+                        password: detailedPassword.encryptedPassword
                     }}
                     onSubmit={handleUpdate}
                     onCancel={() => setIsEditing(false)}
                 />
             ) : (
                 <div>
-                    <h2>{password.serviceName}</h2>
-                    <p>Usuário: {password.username}</p>
-                    <p>Email: {password.email}</p>
-                    <p>Senha: {password.encryptedPassword}</p> {/* Já descriptografada */}
-                    <p>Notas: {password.notes}</p>
+                    <h2>{detailedPassword.serviceName}</h2>
+                    <p>Usuário: {detailedPassword.username}</p>
+                    <p>Email: {detailedPassword.email}</p>
+                    <p>Senha: {detailedPassword.encryptedPassword}</p> {/* Aqui já está descriptografada */}
+                    <p>Notas: {detailedPassword.notes}</p>
                     <button onClick={() => setIsEditing(true)}>Editar</button>
                     <button onClick={onCancel}>Voltar</button>
                 </div>
