@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: pass-hub
+
+  profiles:
+    active: dev
+
+
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+
+
+  security:
+    enabled: false
+    user:
+      name: none
+      password: none
