@@ -61,25 +61,27 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginDTO loginDTO) {
         Optional<User> userOpt = userRepository.findByEmail(loginDTO.getEmail());
-
         if (userOpt.isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário não encontrado");
         }
 
         User user = userOpt.get();
-        boolean isPasswordValid = passwordEncoder.matches(loginDTO.getPassword(), user.getPassword());
 
+        boolean isPasswordValid = passwordEncoder.matches(loginDTO.getPassword(), user.getPassword());
         if (!isPasswordValid) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Senha incorreta");
         }
 
+        // Se não veio o código TOTP, peça para enviar
+        if (loginDTO.getTotp() == null || loginDTO.getTotp().isEmpty()) {
+            return ResponseEntity.status(206).body("Código TOTP necessário");
+        }
+
         try {
             int userTotp = Integer.parseInt(loginDTO.getTotp());
-
             boolean isTotpValid = twoFactorAuthService.isCodeValid(user.getTotpSecret(), userTotp);
 
             if (!isTotpValid) {
-                System.out.println("Código TOTP inválido para o secret fornecido");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Código TOTP inválido");
             }
         } catch (NumberFormatException e) {
@@ -91,7 +93,7 @@ public class AuthController {
         return ResponseEntity.ok(Map.of(
                 "message", "Login bem-sucedido",
                 "token", token
-
         ));
     }
+
 }

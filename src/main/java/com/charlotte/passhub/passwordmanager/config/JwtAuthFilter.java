@@ -6,9 +6,12 @@ import com.charlotte.passhub.passwordmanager.util.JwtUtil;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.List;
 
 @Component
 public class JwtAuthFilter implements Filter {
@@ -24,6 +27,20 @@ public class JwtAuthFilter implements Filter {
             throws IOException, ServletException {
 
         HttpServletRequest httpRequest = (HttpServletRequest) request;
+        String path = httpRequest.getRequestURI();
+
+        // Ignora rotas públicas
+        if (path.startsWith("/auth/") || path.startsWith("/api/auth/")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        // Trata requisições OPTIONS para CORS
+        if ("OPTIONS".equalsIgnoreCase(httpRequest.getMethod())) {
+            chain.doFilter(request, response);
+            return;
+        }
+
         String authHeader = httpRequest.getHeader("Authorization");
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
@@ -33,8 +50,11 @@ public class JwtAuthFilter implements Filter {
             if (userId != null) {
                 User user = userRepository.findById(userId).orElse(null);
                 if (user != null) {
-                    // Autenticação manual (sem Spring Security)
-                    request.setAttribute("user", user);
+                    UsernamePasswordAuthenticationToken authentication =
+                            new UsernamePasswordAuthenticationToken(
+                                    user, null, List.of() // ou user.getAuthorities() se tiver roles
+                            );
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             }
         }
@@ -42,4 +62,3 @@ public class JwtAuthFilter implements Filter {
         chain.doFilter(request, response);
     }
 }
-
