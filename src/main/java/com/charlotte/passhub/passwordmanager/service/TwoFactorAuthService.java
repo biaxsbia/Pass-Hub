@@ -12,7 +12,6 @@ public class TwoFactorAuthService {
     private final GoogleAuthenticator gAuth;
 
     public TwoFactorAuthService() {
-        // Use configuração padrão
         this.gAuth = new GoogleAuthenticator();
     }
 

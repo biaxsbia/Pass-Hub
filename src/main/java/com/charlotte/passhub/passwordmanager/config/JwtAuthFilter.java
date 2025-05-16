@@ -29,13 +29,11 @@ public class JwtAuthFilter implements Filter {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         String path = httpRequest.getRequestURI();
 
-        // Ignora rotas públicas
         if (path.startsWith("/auth/") || path.startsWith("/api/auth/")) {
             chain.doFilter(request, response);
             return;
         }
 
-        // Trata requisições OPTIONS para CORS
         if ("OPTIONS".equalsIgnoreCase(httpRequest.getMethod())) {
             chain.doFilter(request, response);
             return;
@@ -52,7 +50,7 @@ public class JwtAuthFilter implements Filter {
                 if (user != null) {
                     UsernamePasswordAuthenticationToken authentication =
                             new UsernamePasswordAuthenticationToken(
-                                    user, null, List.of() // ou user.getAuthorities() se tiver roles
+                                    user, null, List.of()
                             );
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }

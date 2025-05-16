@@ -50,7 +50,6 @@ public class AuthController {
 
         userRepository.save(user);
 
-        // Retorne o segredo para o frontend gerar o QR Code
         return ResponseEntity.ok(Map.of(
                 "message", "Usuário registrado",
                 "totpSecret", totpSecret,
@@ -72,7 +71,6 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Senha incorreta");
         }
 
-        // Se não veio o código TOTP, peça para enviar
         if (loginDTO.getTotp() == null || loginDTO.getTotp().isEmpty()) {
             return ResponseEntity.status(206).body("Código TOTP necessário");
         }

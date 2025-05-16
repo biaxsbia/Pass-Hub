@@ -10,10 +10,8 @@ public class LoginDTO {
     @NotNull(message = "Senha não pode ser nula")
     private String password;
 
-    // No caso de autenticação de dois fatores (TOTP)
-    private String totp;  // Este campo é opcional, se você estiver utilizando 2FA
+    private String totp;
 
-    // Getters e Setters
     public String getEmail() {
         return email;
     }
