@@ -5,7 +5,7 @@ import com.charlotte.passhub.passwordmanager.dto.UserDTO;
 import com.charlotte.passhub.passwordmanager.model.User;
 import com.charlotte.passhub.passwordmanager.repository.UserRepository;
 import com.charlotte.passhub.passwordmanager.service.TwoFactorAuthService;
-import jakarta.validation.Valid;
+import com.charlotte.passhub.passwordmanager.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +30,9 @@ public class AuthController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JwtUtil jwtUtil;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody UserDTO dto) {
@@ -73,12 +76,6 @@ public class AuthController {
         try {
             int userTotp = Integer.parseInt(loginDTO.getTotp());
 
-            // Logs para debug
-            System.out.println("=== DEBUG TOTP ===");
-            System.out.println("Secret: " + user.getTotpSecret());
-            System.out.println("Código fornecido: " + userTotp);
-            System.out.println("Tempo atual (ms): " + System.currentTimeMillis());
-
             boolean isTotpValid = twoFactorAuthService.isCodeValid(user.getTotpSecret(), userTotp);
 
             if (!isTotpValid) {
@@ -89,6 +86,12 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Código TOTP deve ser numérico");
         }
 
-        return ResponseEntity.ok("Login bem-sucedido");
+        String token = jwtUtil.generateToken(user.getId());
+
+        return ResponseEntity.ok(Map.of(
+                "message", "Login bem-sucedido",
+                "token", token
+
+        ));
     }
 }

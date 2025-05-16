@@ -12,28 +12,22 @@ public class TwoFactorAuthService {
     private final GoogleAuthenticator gAuth;
 
     public TwoFactorAuthService() {
-        GoogleAuthenticatorConfig config = new GoogleAuthenticatorConfig.GoogleAuthenticatorConfigBuilder()
-                .setTimeStepSizeInMillis(TimeUnit.SECONDS.toMillis(30))
-                .setWindowSize(5)  // Janela maior (5 steps = 2.5 minutos)
-                .setNumberOfScratchCodes(0)
-                .setCodeDigits(6)
-                .build();
-        this.gAuth = new GoogleAuthenticator(config);
+        // Use configuração padrão
+        this.gAuth = new GoogleAuthenticator();
     }
 
     public String generateSecretKey() {
-        GoogleAuthenticatorKey key = gAuth.createCredentials();
-        return key.getKey();
+        return gAuth.createCredentials().getKey();
     }
 
     public boolean isCodeValid(String secret, int code) {
         try {
-            // Verifica em uma janela maior (5 steps = 2.5 minutos)
-            return gAuth.authorize(secret, code, 5);
+            return gAuth.authorize(secret, code);
         } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
     }
 }
+
 

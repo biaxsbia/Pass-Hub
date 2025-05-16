@@ -35,3 +35,4 @@ build/
 # Arquivos de configuração
 src/main/resources/application-dev.yml
 src/main/resources/application-prod.yml
+passhub-frontend
