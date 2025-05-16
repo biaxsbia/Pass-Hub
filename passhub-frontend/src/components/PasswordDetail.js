@@ -7,7 +7,6 @@ const PasswordDetail = ({ password, onUpdate, onCancel }) => {
     const [detailedPassword, setDetailedPassword] = useState(password);
 
     useEffect(() => {
-        // Busca a senha descriptografada pelo ID
         if (password && password.id) {
             api.get(`/${password.id}`)
                 .then(res => setDetailedPassword(res.data))
@@ -18,7 +17,7 @@ const PasswordDetail = ({ password, onUpdate, onCancel }) => {
     const handleUpdate = (updatedPassword) => {
         onUpdate(detailedPassword.id, {
             ...updatedPassword,
-            encryptedPassword: updatedPassword.password // o form envia em campo "password"
+            encryptedPassword: updatedPassword.password
         });
         setIsEditing(false);
     };
@@ -41,7 +40,7 @@ const PasswordDetail = ({ password, onUpdate, onCancel }) => {
                     <h2>{detailedPassword.serviceName}</h2>
                     <p>Usuário: {detailedPassword.username}</p>
                     <p>Email: {detailedPassword.email}</p>
-                    <p>Senha: {detailedPassword.encryptedPassword}</p> {/* Aqui já está descriptografada */}
+                    <p>Senha: {detailedPassword.encryptedPassword}</p>
                     <p>Notas: {detailedPassword.notes}</p>
                     <button onClick={() => setIsEditing(true)}>Editar</button>
                     <button onClick={onCancel}>Voltar</button>
