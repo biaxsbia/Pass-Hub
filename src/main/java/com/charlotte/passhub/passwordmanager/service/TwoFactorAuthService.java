@@ -1,14 +1,15 @@
 package com.charlotte.passhub.passwordmanager.service;
 
 import com.warrenstrange.googleauth.GoogleAuthenticator;
-import com.warrenstrange.googleauth.GoogleAuthenticatorConfig;
-import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.concurrent.TimeUnit;
 
 @Service
 public class TwoFactorAuthService {
+
+    Logger logger = LoggerFactory.getLogger(TwoFactorAuthService.class);
     private final GoogleAuthenticator gAuth;
 
     public TwoFactorAuthService() {
@@ -23,7 +24,7 @@ public class TwoFactorAuthService {
         try {
             return gAuth.authorize(secret, code);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Erro");
             return false;
         }
     }

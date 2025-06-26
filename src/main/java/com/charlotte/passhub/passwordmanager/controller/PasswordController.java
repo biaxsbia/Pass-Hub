@@ -1,8 +1,11 @@
 package com.charlotte.passhub.passwordmanager.controller;
 
 import com.charlotte.passhub.passwordmanager.model.Password;
+import com.charlotte.passhub.passwordmanager.model.User;
 import com.charlotte.passhub.passwordmanager.service.PasswordService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -41,8 +44,19 @@ public class PasswordController {
             @ApiResponse(responseCode = "400", description = "Dados inválidos fornecidos")
     })
     public Password addPassword(@RequestBody Password password) {
+        User authenticatedUser = getAuthenticatedUser();
+        password.setUser(authenticatedUser);
         return passwordService.save(password);
     }
+
+    private User getAuthenticatedUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.getPrincipal() instanceof User) {
+            return (User) auth.getPrincipal();
+        }
+        throw new RuntimeException("Usuário não autenticado");
+    }
+
 
     @GetMapping("/{id}")
     @Operation(summary = "Buscar senha por ID",
