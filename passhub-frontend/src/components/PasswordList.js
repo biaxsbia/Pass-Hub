@@ -21,11 +21,14 @@ const fetchPasswords = async () => {
         console.error('Erro ao buscar senhas:', error);
         if (error.response?.status === 403) {
             alert('Sessão expirada ou acesso negado. Faça login novamente.');
-            localStorage.removeItem('token');
-            window.location.reload();
+            setTimeout(() => {
+                localStorage.removeItem('token');
+                window.location.reload();
+            }, 100);
         }
     }
 };
+
 
 
 const handleAddPassword = async (password) => {
