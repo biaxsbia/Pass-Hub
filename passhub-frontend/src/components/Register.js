@@ -19,14 +19,13 @@ export default function Register() {
     try {
       const response = await axios.post("http://localhost:8080/auth/register", {
         email,
-        password
+        password,
       });
 
       const data = response.data;
       setSuccess("Usuário registrado com sucesso!");
       setOtpUrl(data.otpAuthUrl);
       setTotpSecret(data.totpSecret);
-
     } catch (err) {
       setError(err.response?.data || "Erro ao registrar");
     }
@@ -37,7 +36,8 @@ export default function Register() {
       <h2>Cadastro</h2>
       <form onSubmit={handleRegister}>
         <div>
-          <label>Email:</label><br />
+          <label>Email:</label>
+          <br />
           <input
             type="email"
             required
@@ -46,7 +46,8 @@ export default function Register() {
           />
         </div>
         <div>
-          <label>Senha:</label><br />
+          <label>Senha:</label>
+          <br />
           <input
             type="password"
             required
@@ -54,17 +55,28 @@ export default function Register() {
             onChange={(e) => setPassword(e.target.value)}
           />
         </div>
-        <button type="submit" style={{ marginTop: 10 }}>Registrar</button>
+        <button type="submit" style={{ marginTop: 10 }}>
+          Registrar
+        </button>
       </form>
 
       {error && <p style={{ color: "red", marginTop: 10 }}>{error}</p>}
-      {success && <p style={{ color: "green", marginTop: 10 }}>{success}</p>}
+      {success && (
+        <div style={{ color: "green", marginTop: 10 }}>
+          <p>{success}</p>
+          <p>
+            Para ativar sua autenticação em dois fatores, escaneie o QR Code abaixo com o Google Authenticator. <p></p>Quando terminar, clique em <a href="/login">"Fazer login"</a>
+          </p>
+        </div>
+      )}
 
       {otpUrl && (
         <div style={{ marginTop: 20 }}>
           <h3>Escaneie o QR Code no Google Authenticator:</h3>
           <QRCodeSVG value={otpUrl} size={200} />
-          <p style={{ marginTop: 10 }}><strong>Código manual (caso necessário):</strong></p>
+          <p style={{ marginTop: 10 }}>
+            <strong>Código manual (caso necessário):</strong>
+          </p>
           <code>{totpSecret}</code>
         </div>
       )}

@@ -13,9 +13,23 @@ function App() {
     setLoggedIn(!!token);
   }, []);
 
+
+const handleLogout = () => {
+    localStorage.removeItem('token');
+    setLoggedIn(false);
+  };
+
   if (loggedIn) {
-    return <PasswordList />;
-  }
+  return (
+    <div className="App">
+      <button onClick={handleLogout} style={{ position: 'absolute', top: 10, right: 10 }}>
+        Sair
+      </button>
+      <PasswordList />
+    </div>
+  );
+}
+
 
   return (
     <div className="App">
