@@ -62,7 +62,7 @@ const handleDeletePassword = async (id) => {
 
     return (
         <div>
-            <h1>Gerenciador de Senhas</h1>
+            <h1>Pass Hub</h1>
             <button onClick={() => setShowForm(!showForm)}>
                 {showForm ? 'Cancelar' : 'Adicionar Senha'}
             </button>
