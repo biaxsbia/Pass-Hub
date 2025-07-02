@@ -1,8 +1,10 @@
 package com.charlotte.passhub.passwordmanager.dto;
 import lombok.Data;
 import lombok.Getter;
+import lombok.Setter;
 
 
+@Setter
 @Getter
 @Data
 class LoginRequest {
@@ -10,17 +12,6 @@ class LoginRequest {
     private String password;
     private int totpCode;
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public void setTotpCode(int totpCode) {
-        this.totpCode = totpCode;
-    }
 }
 
 
