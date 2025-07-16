@@ -5,17 +5,46 @@ import { QRCodeSVG } from "qrcode.react";
 export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [otpUrl, setOtpUrl] = useState(null);
   const [totpSecret, setTotpSecret] = useState(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [copied, setCopied] = useState(false); // <- novo estado
+  const [copied, setCopied] = useState(false);
+
+  const validatePassword = (password) => {
+    const minLength = 6;
+    const hasLetter = /[a-zA-Z]/.test(password);
+    const hasNumber = /\d/.test(password);
+    const hasSpecialChar = /[^a-zA-Z0-9]/.test(password);
+    return (
+      password.length >= minLength &&
+      hasLetter &&
+      hasNumber &&
+      hasSpecialChar
+    );
+  };
+
+  const isPasswordValid = validatePassword(password);
+  const doPasswordsMatch = password === confirmPassword;
 
   const handleRegister = async (e) => {
     e.preventDefault();
     setError("");
     setSuccess("");
     setOtpUrl(null);
+
+    if (!isPasswordValid) {
+      setError(
+        "A senha deve conter pelo menos 6 caracteres, incluindo letras, números e um caractere especial."
+      );
+      return;
+    }
+
+    if (!doPasswordsMatch) {
+      setError("As senhas não coincidem.");
+      return;
+    }
 
     try {
       const response = await axios.post("http://localhost:8080/auth/register", {
@@ -35,7 +64,7 @@ export default function Register() {
   const handleCopy = () => {
     navigator.clipboard.writeText(totpSecret).then(() => {
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000); // mensagem por 2 segundos
+      setTimeout(() => setCopied(false), 2000);
     });
   };
 
@@ -52,7 +81,8 @@ export default function Register() {
             onChange={(e) => setEmail(e.target.value)}
           />
         </div>
-        <div>
+
+        <div style={{ marginTop: 10 }}>
           <label>Senha:</label><br />
           <input
             type="password"
@@ -60,8 +90,41 @@ export default function Register() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
+          {!isPasswordValid && password && (
+            <p style={{ color: "red", fontSize: "0.9em" }}>
+              A senha deve ter pelo menos 6 caracteres, letras, números e um caractere especial.
+            </p>
+          )}
         </div>
-        <button type="submit" style={{ marginTop: 10 }}>
+
+        <div style={{ marginTop: 10 }}>
+          <label>Confirmar Senha:</label><br />
+          <input
+            type="password"
+            required
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+          />
+          {confirmPassword && !doPasswordsMatch && (
+            <p style={{ color: "red", fontSize: "0.9em" }}>
+              As senhas não coincidem.
+            </p>
+          )}
+        </div>
+
+        <button
+          type="submit"
+          disabled={!isPasswordValid || !doPasswordsMatch}
+          style={{
+            marginTop: 15,
+            backgroundColor: !isPasswordValid || !doPasswordsMatch ? "#ccc" : "#4CAF50",
+            color: "white",
+            cursor: !isPasswordValid || !doPasswordsMatch ? "not-allowed" : "pointer",
+            padding: "8px 16px",
+            border: "none",
+            borderRadius: "4px",
+          }}
+        >
           Registrar
         </button>
       </form>
