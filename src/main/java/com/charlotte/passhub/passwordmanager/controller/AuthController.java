@@ -52,10 +52,11 @@ public class AuthController {
         String hashedPassword = passwordEncoder.encode(dto.getPassword());
         String totpSecret = twoFactorAuthService.generateSecretKey();
 
+
         User user = new User();
         user.setEmail(dto.getEmail());
         user.setPassword(hashedPassword);
-        user.setTotpSecret(totpSecret);
+        user.setTotpSecret(twoFactorAuthService.encryptSecret(totpSecret));
 
         userRepository.save(user);
 
