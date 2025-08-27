@@ -16,7 +16,7 @@ export default function Login({ onLoginSuccess }) {
 
     const payload = step === 1 
       ? { email, password } 
-      : { email, password, totp };
+      : { email, password, totp: String(totp) };
 
     try {
       const response = await fetch("http://localhost:8080/auth/login", {
