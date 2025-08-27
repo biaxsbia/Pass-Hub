@@ -6,6 +6,9 @@ import com.charlotte.passhub.passwordmanager.model.User;
 import com.charlotte.passhub.passwordmanager.repository.UserRepository;
 import com.charlotte.passhub.passwordmanager.service.TwoFactorAuthService;
 import com.charlotte.passhub.passwordmanager.util.JwtUtil;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +38,12 @@ public class AuthController {
     private JwtUtil jwtUtil;
 
     @PostMapping("/register")
+    @Operation(summary = "Registrar usuário",
+            description = "Registra um novo usuário no sistema")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Usuário registrado com sucesso"),
+            @ApiResponse(responseCode = "409", description = "Email já registrado")
+    })
     public ResponseEntity<?> register(@RequestBody UserDTO dto) {
         if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Email já registrado");
@@ -51,13 +60,24 @@ public class AuthController {
         userRepository.save(user);
 
         return ResponseEntity.ok(Map.of(
-                "message", "Usuário registrado",
+                "message", "Usuário registrado com sucesso",
                 "totpSecret", totpSecret,
                 "otpAuthUrl", "otpauth://totp/PasswordManager:" + dto.getEmail() + "?secret=" + totpSecret + "&issuer=PasswordManager"
         ));
     }
 
     @PostMapping("/login")
+    @Operation(summary = "Login",
+            description = "Loga o usuário no sistema")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Usuário registrado com sucesso"),
+            @ApiResponse(responseCode = "401", description = "Usuário não encontrado"),
+            @ApiResponse(responseCode = "401", description = "Senha incorreta"),
+            @ApiResponse(responseCode = "206", description = "Código TOTP necessário"),
+            @ApiResponse(responseCode = "401", description = "Código TOTP inválido"),
+            @ApiResponse(responseCode = "400", description = "Código TOTP deve ser numérico"),
+            @ApiResponse(responseCode = "200", description = "Login bem-sucedido"),
+    })
     public ResponseEntity<?> login(@RequestBody LoginDTO loginDTO) {
         Optional<User> userOpt = userRepository.findByEmail(loginDTO.getEmail());
         if (userOpt.isEmpty()) {
