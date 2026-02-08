@@ -1,9 +1,9 @@
-package com.charlotte.passhub.passwordmanager.service;
+package com.charlotte.passhub.service;
 
-import com.charlotte.passhub.passwordmanager.model.Password;
-import com.charlotte.passhub.passwordmanager.model.User;
-import com.charlotte.passhub.passwordmanager.repository.PasswordRepository;
-import com.charlotte.passhub.passwordmanager.repository.UserRepository;
+import com.charlotte.passhub.model.Password;
+import com.charlotte.passhub.model.User;
+import com.charlotte.passhub.repository.PasswordRepository;
+import com.charlotte.passhub.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -11,7 +11,9 @@ import org.springframework.security.crypto.encrypt.Encryptors;
 import org.springframework.security.crypto.encrypt.TextEncryptor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class PasswordService {
@@ -21,7 +23,6 @@ public class PasswordService {
 
     @Autowired
     private UserRepository userRepository;
-
 
     private final TextEncryptor encryptor = Encryptors.text("password", "5c0744940b5c369b");
 
@@ -38,38 +39,35 @@ public class PasswordService {
         throw new RuntimeException("Usuário não autenticado");
     }
 
-
     public Password save(Password password) {
-        if (password.getUser() == null || password.getUser().getId() == null) {
-            throw new IllegalArgumentException("Usuário deve ser informado");
+        User user = getAuthenticatedUser();
+        password.setUserId(user.getId());
+
+        if (password.getId() == null) {
+            password.setId(UUID.randomUUID().toString());
+            password.setCreatedAt(Instant.now().toString());
         }
+        password.setUpdatedAt(Instant.now().toString());
 
-        User user = userRepository.findById(password.getUser().getId())
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
-
-        password.setUser(user);
-
-        if (password.getId() != null) {
-            Password existing = passwordRepository.findById(password.getId()).orElse(null);
-            if (existing != null && password.getEncryptedPassword().equals(existing.getEncryptedPassword())) {
-                return passwordRepository.save(password);
-            }
+        if (password.getEncryptedPassword() != null) {
+            password.setEncryptedPassword(encryptor.encrypt(password.getEncryptedPassword()));
         }
-
-        password.setEncryptedPassword(encryptor.encrypt(password.getEncryptedPassword()));
 
         return passwordRepository.save(password);
     }
 
-
-    public void deleteById(Long id) {
+    public void deleteById(String id) {
         passwordRepository.deleteById(id);
     }
 
-    public Password findById(Long id) {
+    public Password findById(String id) {
         Password password = passwordRepository.findById(id).orElse(null);
-        if (password != null) {
-            password.setEncryptedPassword(encryptor.decrypt(password.getEncryptedPassword()));
+        if (password != null && password.getEncryptedPassword() != null) {
+            try {
+                password.setEncryptedPassword(encryptor.decrypt(password.getEncryptedPassword()));
+            } catch (Exception e) {
+                // Se não conseguir descriptografar, mantém o original
+            }
         }
         return password;
     }

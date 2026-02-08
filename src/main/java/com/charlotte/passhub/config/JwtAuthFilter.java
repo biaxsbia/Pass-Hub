@@ -1,8 +1,8 @@
-package com.charlotte.passhub.passwordmanager.config;
+package com.charlotte.passhub.config;
 
-import com.charlotte.passhub.passwordmanager.model.User;
-import com.charlotte.passhub.passwordmanager.repository.UserRepository;
-import com.charlotte.passhub.passwordmanager.util.JwtUtil;
+import com.charlotte.passhub.model.User;
+import com.charlotte.passhub.repository.UserRepository;
+import com.charlotte.passhub.util.JwtUtil;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +43,7 @@ public class JwtAuthFilter implements Filter {
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
-            Long userId = jwtUtil.validateTokenAndGetUserId(token);
+            String userId = jwtUtil.validateTokenAndGetUserId(token);
 
             if (userId != null) {
                 User user = userRepository.findById(userId).orElse(null);

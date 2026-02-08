@@ -1,11 +1,8 @@
-package com.charlotte.passhub.passwordmanager.controller;
+package com.charlotte.passhub.controller;
 
-import com.charlotte.passhub.passwordmanager.model.Password;
-import com.charlotte.passhub.passwordmanager.model.User;
-import com.charlotte.passhub.passwordmanager.service.PasswordService;
+import com.charlotte.passhub.model.Password;
+import com.charlotte.passhub.service.PasswordService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,10 +12,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/passwords")
@@ -30,7 +23,7 @@ public class PasswordController {
 
     @GetMapping
     @Operation(summary = "Listar todas as senhas",
-            description = "Retorna uma lista com todas as senhas cadastradas")
+            description = "Retorna uma lista com todas as senhas cadastradas do usuário autenticado")
     @ApiResponse(responseCode = "200", description = "Lista de senhas retornada com sucesso")
     public List<Password> getAllPasswords() {
         return passwordService.findAll();
@@ -44,19 +37,8 @@ public class PasswordController {
             @ApiResponse(responseCode = "400", description = "Dados inválidos fornecidos")
     })
     public Password addPassword(@RequestBody Password password) {
-        User authenticatedUser = getAuthenticatedUser();
-        password.setUser(authenticatedUser);
         return passwordService.save(password);
     }
-
-    private User getAuthenticatedUser() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.getPrincipal() instanceof User) {
-            return (User) auth.getPrincipal();
-        }
-        throw new RuntimeException("Usuário não autenticado");
-    }
-
 
     @GetMapping("/{id}")
     @Operation(summary = "Buscar senha por ID",
@@ -66,8 +48,8 @@ public class PasswordController {
             @ApiResponse(responseCode = "404", description = "Senha não encontrada")
     })
     public Password getPasswordById(
-            @Parameter(description = "ID da senha a ser buscada", required = true, example = "1")
-            @PathVariable Long id) {
+            @Parameter(description = "ID da senha a ser buscada", required = true, example = "uuid-123")
+            @PathVariable String id) {
         return passwordService.findById(id);
     }
 
@@ -80,8 +62,8 @@ public class PasswordController {
             @ApiResponse(responseCode = "404", description = "Senha não encontrada")
     })
     public Password updatePassword(
-            @Parameter(description = "ID da senha a ser atualizada", required = true, example = "1")
-            @PathVariable Long id,
+            @Parameter(description = "ID da senha a ser atualizada", required = true, example = "uuid-123")
+            @PathVariable String id,
             @RequestBody Password password) {
         password.setId(id);
         return passwordService.save(password);
@@ -95,8 +77,8 @@ public class PasswordController {
             @ApiResponse(responseCode = "404", description = "Senha não encontrada")
     })
     public void deletePassword(
-            @Parameter(description = "ID da senha a ser excluída", required = true, example = "1")
-            @PathVariable Long id) {
+            @Parameter(description = "ID da senha a ser excluída", required = true, example = "uuid-123")
+            @PathVariable String id) {
         passwordService.deleteById(id);
     }
 }

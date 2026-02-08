@@ -1,4 +1,4 @@
-package com.charlotte.passhub.passwordmanager.dto;
+package com.charlotte.passhub.dto;
 
 import lombok.Data;
 

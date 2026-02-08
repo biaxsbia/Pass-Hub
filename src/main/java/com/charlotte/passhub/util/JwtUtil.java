@@ -1,4 +1,4 @@
-package com.charlotte.passhub.passwordmanager.util;
+package com.charlotte.passhub.util;
 
 
 import java.util.Date;
@@ -21,25 +21,23 @@ public class JwtUtil {
 
     private final Key secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
-    public String generateToken(Long userId) {
+    public String generateToken(String userId) {
         return Jwts.builder()
-                .setSubject(String.valueOf(userId))
+                .setSubject(userId)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 86400000))
                 .signWith(secretKey)
                 .compact();
     }
 
-    public Long validateTokenAndGetUserId(String token) {
+    public String validateTokenAndGetUserId(String token) {
         try {
-            String subject = Jwts.parserBuilder()
+            return Jwts.parserBuilder()
                     .setSigningKey(secretKey)
                     .build()
                     .parseClaimsJws(token)
                     .getBody()
                     .getSubject();
-
-            return Long.parseLong(subject);
         } catch (Exception e) {
             return null;
         }

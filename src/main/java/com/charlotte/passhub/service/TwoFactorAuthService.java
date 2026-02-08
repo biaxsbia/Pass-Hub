@@ -1,4 +1,4 @@
-package com.charlotte.passhub.passwordmanager.service;
+package com.charlotte.passhub.service;
 
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import org.springframework.security.crypto.encrypt.Encryptors;

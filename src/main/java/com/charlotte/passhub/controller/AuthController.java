@@ -1,11 +1,11 @@
-package com.charlotte.passhub.passwordmanager.controller;
+package com.charlotte.passhub.controller;
 
-import com.charlotte.passhub.passwordmanager.dto.LoginDTO;
-import com.charlotte.passhub.passwordmanager.dto.UserDTO;
-import com.charlotte.passhub.passwordmanager.model.User;
-import com.charlotte.passhub.passwordmanager.repository.UserRepository;
-import com.charlotte.passhub.passwordmanager.service.TwoFactorAuthService;
-import com.charlotte.passhub.passwordmanager.util.JwtUtil;
+import com.charlotte.passhub.dto.LoginDTO;
+import com.charlotte.passhub.dto.UserDTO;
+import com.charlotte.passhub.model.User;
+import com.charlotte.passhub.repository.UserRepository;
+import com.charlotte.passhub.service.TwoFactorAuthService;
+import com.charlotte.passhub.util.JwtUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/auth")
@@ -54,6 +55,7 @@ public class AuthController {
 
 
         User user = new User();
+        user.setId(UUID.randomUUID().toString());
         user.setEmail(dto.getEmail());
         user.setPassword(hashedPassword);
         user.setTotpSecret(twoFactorAuthService.encryptSecret(totpSecret));
