@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: pass-hub
+
+  cloud:
+    aws:
+      region:
+        static: us-east-1
+      credentials:
+        access-key:
+        secret-key:
+      dynamodb:
+        endpoint:
+
+  security:
+    enabled: true
+    user:
+      name: none
+      password: none
