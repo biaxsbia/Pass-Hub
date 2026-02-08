@@ -1,9 +1,9 @@
 package com.charlotte.passhub.config;
 
-import com.charlotte.passhub.model.User;
 import com.charlotte.passhub.repository.UserRepository;
 import com.charlotte.passhub.util.JwtUtil;
 import jakarta.servlet.*;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -39,24 +39,45 @@ public class JwtAuthFilter implements Filter {
             return;
         }
 
-        String authHeader = httpRequest.getHeader("Authorization");
+        String token = getTokenFromRequest(httpRequest);
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7);
+        if (token != null) {
             String userId = jwtUtil.validateTokenAndGetUserId(token);
 
             if (userId != null) {
-                User user = userRepository.findById(userId).orElse(null);
-                if (user != null) {
+                userRepository.findById(userId).ifPresent(user -> {
+
                     UsernamePasswordAuthenticationToken authentication =
                             new UsernamePasswordAuthenticationToken(
-                                    user, null, List.of()
+                                    user,
+                                    null,
+                                    List.of()
                             );
+
                     SecurityContextHolder.getContext().setAuthentication(authentication);
-                }
+                });
             }
         }
 
         chain.doFilter(request, response);
     }
+
+    private String getTokenFromRequest(HttpServletRequest request) {
+
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("access_token".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            return authHeader.substring(7);
+        }
+
+        return null;
+    }
+
 }
