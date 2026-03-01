@@ -6,14 +6,29 @@ spring:
     aws:
       region:
         static: us-east-1
-      credentials:
-        access-key:
-        secret-key:
       dynamodb:
-        endpoint:
+        endpoint: https://dynamodb.us-east-1.amazonaws.com
+
 
   security:
     enabled: true
     user:
       name: none
       password: none
+
+
+app:
+  encryption:
+    password: ${ENCRYPTION_PASSWORD:dev_encryption_password_local}
+    salt: ${ENCRYPTION_SALT:5c0744940b5c369b}
+
+  totp:
+    encryption:
+      password: ${TOTP_ENCRYPTION_PASSWORD:dev_totp_password_local}
+      salt: ${TOTP_ENCRYPTION_SALT:5c0744940b5c369b}
+
+  jwt:
+    secret: ${JWT_SECRET:dev_jwt_secret_must_be_at_least_32_chars_long_local}
+
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000}

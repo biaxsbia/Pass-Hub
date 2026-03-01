@@ -2,9 +2,12 @@ spring:
   application:
     name: pass-hub
 
-#  profiles:
-#    active: dev
-
+  cloud:
+    aws:
+      region:
+        static: us-east-1
+      dynamodb:
+        endpoint: https://dynamodb.us-east-1.amazonaws.com
 
   security:
     enabled: true
