@@ -24,7 +24,15 @@ public class PasswordService {
     @Autowired
     private UserRepository userRepository;
 
-    private final TextEncryptor encryptor = Encryptors.text("password", "5c0744940b5c369b");
+    @org.springframework.beans.factory.annotation.Value("${app.encryption.password}")
+    private String encryptionPassword;
+
+    @org.springframework.beans.factory.annotation.Value("${app.encryption.salt}")
+    private String encryptionSalt;
+
+    private TextEncryptor getEncryptor() {
+        return Encryptors.text(encryptionPassword, encryptionSalt);
+    }
 
     public List<Password> findAll() {
         User user = getAuthenticatedUser();
@@ -50,21 +58,33 @@ public class PasswordService {
         password.setUpdatedAt(Instant.now().toString());
 
         if (password.getEncryptedPassword() != null) {
-            password.setEncryptedPassword(encryptor.encrypt(password.getEncryptedPassword()));
+            password.setEncryptedPassword(getEncryptor().encrypt(password.getEncryptedPassword()));
         }
 
         return passwordRepository.save(password);
     }
 
     public void deleteById(String id) {
-        passwordRepository.deleteById(id);
+        User user = getAuthenticatedUser();
+        Password password = passwordRepository.findById(id).orElse(null);
+        if (password != null && password.getUserId().equals(user.getId())) {
+            passwordRepository.deleteById(id);
+        } else {
+            throw new RuntimeException("Acesso negado ou senha não encontrada");
+        }
     }
 
     public Password findById(String id) {
+        User user = getAuthenticatedUser();
         Password password = passwordRepository.findById(id).orElse(null);
-        if (password != null && password.getEncryptedPassword() != null) {
+
+        if (password == null || !password.getUserId().equals(user.getId())) {
+            throw new RuntimeException("Acesso negado ou senha não encontrada");
+        }
+
+        if (password.getEncryptedPassword() != null) {
             try {
-                password.setEncryptedPassword(encryptor.decrypt(password.getEncryptedPassword()));
+                password.setEncryptedPassword(getEncryptor().decrypt(password.getEncryptedPassword()));
             } catch (Exception e) {
                 // Se não conseguir descriptografar, mantém o original
             }
